@@ -1,7 +1,5 @@
 "use server";
 
-import { mkdir, writeFile } from "node:fs/promises";
-import path from "node:path";
 import { redirect } from "next/navigation";
 import {
   completeEmployeeProfile,
@@ -77,16 +75,10 @@ export async function completeProfileAction(
     return { ok: false, error: "Image must be under 5MB." };
   }
 
-  const ext = photo.name.split(".").pop()?.toLowerCase() || "jpg";
-  const safeExt = ["jpg", "jpeg", "png", "webp"].includes(ext) ? ext : "jpg";
-  const fileName = `${session.employeeId}-${Date.now()}.${safeExt}`;
-  const uploadDir = path.join(process.cwd(), "public", "uploads", "profiles");
-  await mkdir(uploadDir, { recursive: true });
-
+  // Store in MongoDB (Vercel filesystem is read-only)
   const bytes = Buffer.from(await photo.arrayBuffer());
-  await writeFile(path.join(uploadDir, fileName), bytes);
+  const profilePicUrl = `data:${photo.type};base64,${bytes.toString("base64")}`;
 
-  const profilePicUrl = `/uploads/profiles/${fileName}`;
   const updated = await completeEmployeeProfile(session.id, {
     store,
     storeManagerName,

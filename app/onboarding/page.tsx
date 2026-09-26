@@ -7,7 +7,28 @@ export default async function OnboardingPage() {
   const session = await getSession();
   if (!session) redirect("/");
 
-  const employee = await findEmployeeById(session.id);
+  let employee;
+  try {
+    employee = await findEmployeeById(session.id);
+  } catch {
+    return (
+      <div className="flex min-h-full flex-1 items-center justify-center bg-[#eef1f3] px-4">
+        <div className="max-w-md rounded-3xl bg-white p-8 text-center shadow-sm">
+          <h1 className="text-xl font-bold text-brand-green">Connection error</h1>
+          <p className="mt-2 text-sm text-muted">
+            Could not reach the database. Check your MongoDB connection and try again.
+          </p>
+          <a
+            href="/"
+            className="mt-6 inline-flex h-11 items-center justify-center rounded-xl bg-brand-green px-5 font-semibold text-white"
+          >
+            Back to login
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   if (!employee) redirect("/");
   if (employee.profileComplete) redirect("/dashboard");
 
