@@ -34,6 +34,8 @@ export default async function Home() {
 
   return (
     <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-[#eef1f3] px-4 py-8 sm:px-6 lg:px-8">
+      <div className="stripe-corner-tr" aria-hidden />
+      <div className="stripe-corner-br" aria-hidden />
       <div className="animate-fade-in relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-[0_25px_60px_-20px_rgba(0,40,25,0.28)] lg:grid-cols-[1.4fr_0.95fr]">
         <aside className="relative flex min-h-[480px] flex-col overflow-hidden lg:min-h-[660px]">
           <Image

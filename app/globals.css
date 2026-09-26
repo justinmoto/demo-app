@@ -61,3 +61,71 @@ body {
 .animate-fade-in {
   animation: fade-in 0.7s ease-out both;
 }
+
+.stripe-corner-br {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 240px;
+  height: 240px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.stripe-corner-br::before {
+  content: "";
+  position: absolute;
+  right: -70px;
+  bottom: -70px;
+  width: 380px;
+  height: 380px;
+  background: linear-gradient(
+    -45deg,
+    transparent 0 120px,
+    var(--brand-green) 120px 148px,
+    transparent 148px 164px,
+    var(--brand-red) 164px 192px,
+    transparent 192px 208px,
+    var(--brand-green) 208px 236px,
+    transparent 236px 100%
+  );
+}
+
+.stripe-corner-tr {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 240px;
+  height: 240px;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.stripe-corner-tr::before {
+  content: "";
+  position: absolute;
+  right: -70px;
+  top: -70px;
+  width: 380px;
+  height: 380px;
+  background: linear-gradient(
+    -135deg,
+    transparent 0 120px,
+    var(--brand-green) 120px 148px,
+    transparent 148px 164px,
+    var(--brand-red) 164px 192px,
+    transparent 192px 208px,
+    var(--brand-green) 208px 236px,
+    transparent 236px 100%
+  );
+}
+
+@media (min-width: 640px) {
+  .stripe-corner-br,
+  .stripe-corner-tr {
+    width: 300px;
+    height: 300px;
+  }
+}
