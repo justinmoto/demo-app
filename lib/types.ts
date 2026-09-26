@@ -15,10 +15,15 @@ export type SessionUser = {
   employeeId: string;
   name: string;
   profileComplete: boolean;
+  remember: boolean;
 };
 
 export type LoginResult =
-  | { ok: true; needsOnboarding: boolean }
+  | { ok: true; needsOnboarding: boolean; employeeId: string; remember: boolean }
+  | { ok: false; error: string };
+
+export type RegisterResult =
+  | { ok: true; needsOnboarding: true }
   | { ok: false; error: string };
 
 export type OnboardingResult =

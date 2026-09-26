@@ -1,10 +1,11 @@
 /**
- * Premade login accounts (npm run seed)
+ * Premade accounts (npm run seed) — password: password123
  *
- * EMP001  Juan Dela Cruz   password123
- * EMP002  Maria Santos     password123
- * EMP003  Pedro Reyes      password123
+ * EMP001  Juan Dela Cruz
+ * EMP002  Maria Santos
+ * EMP003  Pedro Reyes
+ * EMP004  Ana Villanueva
+ * EMP005  Carlo Mendoza
  *
- * New accounts have profileComplete: false → after sign-in animation
- * they go to /onboarding (store, storeManagerName, profilePic).
+ * New accounts → profileComplete: false → /onboarding after login
  */

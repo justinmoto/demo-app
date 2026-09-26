@@ -1,5 +1,6 @@
 import Image from "next/image";
 import LoginRightPanel from "./LoginRightPanel";
+import { getRememberedEmployeeId } from "@/lib/session";
 
 const features = [
   {
@@ -28,7 +29,9 @@ const offices = [
   { city: "IMUS", label: "Office" },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const rememberedEmployeeId = await getRememberedEmployeeId();
+
   return (
     <div className="relative flex min-h-full flex-1 items-center justify-center overflow-hidden bg-[#eef1f3] px-4 py-8 sm:px-6 lg:px-8">
       <div className="animate-fade-in relative z-10 grid w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-[0_25px_60px_-20px_rgba(0,40,25,0.28)] lg:grid-cols-[1.4fr_0.95fr]">
@@ -144,7 +147,7 @@ export default function Home() {
           </div>
         </aside>
 
-        <LoginRightPanel />
+        <LoginRightPanel rememberedEmployeeId={rememberedEmployeeId} />
       </div>
     </div>
   );

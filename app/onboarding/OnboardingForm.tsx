@@ -47,7 +47,6 @@ export default function OnboardingForm() {
             type="file"
             name="profilePic"
             accept="image/png,image/jpeg,image/webp"
-            required
             disabled={pending}
             className="sr-only"
             onChange={(e) => {
@@ -60,7 +59,7 @@ export default function OnboardingForm() {
             }}
           />
         </label>
-        <p className="text-xs text-muted">Store Manager profile picture</p>
+        <p className="text-xs text-muted">Store Manager profile picture (optional)</p>
       </div>
 
       <div className="flex flex-col gap-1.5">
@@ -99,9 +98,16 @@ export default function OnboardingForm() {
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 flex h-12 w-full items-center justify-center rounded-xl bg-brand-green font-semibold text-white transition hover:bg-brand-green-dark disabled:opacity-70"
+        className="mt-2 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-green font-semibold text-white transition hover:bg-brand-green-dark disabled:opacity-70"
       >
-        {pending ? "Saving..." : "Continue"}
+        {pending ? (
+          <>
+            <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+            Saving...
+          </>
+        ) : (
+          "Continue"
+        )}
       </button>
     </form>
   );

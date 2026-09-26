@@ -37,19 +37,26 @@ const accounts = [
     employeeId: "EMP001",
     name: "Juan Dela Cruz",
     password: "password123",
-    isActive: true,
   },
   {
     employeeId: "EMP002",
     name: "Maria Santos",
     password: "password123",
-    isActive: true,
   },
   {
     employeeId: "EMP003",
     name: "Pedro Reyes",
     password: "password123",
-    isActive: true,
+  },
+  {
+    employeeId: "EMP004",
+    name: "Ana Villanueva",
+    password: "password123",
+  },
+  {
+    employeeId: "EMP005",
+    name: "Carlo Mendoza",
+    password: "password123",
   },
 ];
 
@@ -78,7 +85,7 @@ try {
         $set: {
           name: account.name,
           passwordHash,
-          isActive: account.isActive,
+          isActive: true,
           profileComplete: false,
           store: null,
           storeManagerName: null,
@@ -92,9 +99,9 @@ try {
   }
 
   console.log("\nPremade accounts (password for all: password123)");
-  console.log("  EMP001  Juan Dela Cruz");
-  console.log("  EMP002  Maria Santos");
-  console.log("  EMP003  Pedro Reyes");
+  for (const a of accounts) {
+    console.log(`  ${a.employeeId}  ${a.name}`);
+  }
 } finally {
   await client.close();
 }

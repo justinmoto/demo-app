@@ -61,12 +61,3 @@ body {
 .animate-fade-in {
   animation: fade-in 0.7s ease-out both;
 }
-
-.login-brand-stripes {
-  background: repeating-linear-gradient(
-    -45deg,
-    var(--brand-green) 0 48px,
-    var(--brand-red) 48px 96px,
-    var(--brand-green) 96px 144px
-  );
-}

@@ -6,47 +6,47 @@ import { loginAction } from "@/app/actions/auth";
 import type { LoginResult } from "@/lib/types";
 
 const initialState: LoginResult | null = null;
+const REMEMBER_KEY = "m2s_remember_employee_id";
 
-export default function LoginRightPanel() {
+type Props = {
+  rememberedEmployeeId?: string | null;
+};
+
+export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
   const router = useRouter();
   const [state, formAction, pending] = useActionState(loginAction, initialState);
   const [showPassword, setShowPassword] = useState(false);
-  const [animating, setAnimating] = useState(false);
+  const [employeeId, setEmployeeId] = useState(rememberedEmployeeId ?? "");
+  const [remember, setRemember] = useState(Boolean(rememberedEmployeeId));
+
+  useEffect(() => {
+    if (rememberedEmployeeId) {
+      setEmployeeId(rememberedEmployeeId);
+      setRemember(true);
+      return;
+    }
+    const saved = localStorage.getItem(REMEMBER_KEY);
+    if (saved) {
+      setEmployeeId(saved);
+      setRemember(true);
+    }
+  }, [rememberedEmployeeId]);
 
   useEffect(() => {
     if (!state?.ok) return;
 
-    setAnimating(true);
-    const timer = setTimeout(() => {
-      router.push(state.needsOnboarding ? "/onboarding" : "/dashboard");
-    }, 1600);
+    if (state.remember) {
+      localStorage.setItem(REMEMBER_KEY, state.employeeId);
+    } else {
+      localStorage.removeItem(REMEMBER_KEY);
+    }
 
-    return () => clearTimeout(timer);
+    router.push(state.needsOnboarding ? "/onboarding" : "/dashboard");
   }, [state, router]);
 
   return (
     <section className="relative flex flex-col justify-center overflow-hidden px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
-      <div
-        className={`pointer-events-none absolute inset-0 z-20 transition-transform duration-[1400ms] ease-in-out ${
-          animating ? "translate-x-0" : "translate-x-full"
-        }`}
-        aria-hidden
-      >
-        <div className="login-brand-stripes h-full w-full" />
-        {animating && (
-          <p className="absolute inset-0 flex items-center justify-center font-[family-name:var(--font-outfit)] text-lg font-bold text-white drop-shadow">
-            {state?.ok && state.needsOnboarding
-              ? "Setting up your profile..."
-              : "Welcome back!"}
-          </p>
-        )}
-      </div>
-
-      <div
-        className={`mx-auto w-full max-w-md transition-opacity duration-300 ${
-          animating ? "opacity-0" : "opacity-100"
-        }`}
-      >
+      <div className="mx-auto w-full max-w-md">
         <h2 className="font-[family-name:var(--font-outfit)] text-2xl font-bold tracking-tight text-[#0f2a1f] sm:text-[1.7rem]">
           Sign in to your account
         </h2>
@@ -82,7 +82,9 @@ export default function LoginRightPanel() {
                 autoComplete="username"
                 placeholder="Enter your employee ID"
                 required
-                disabled={pending || animating}
+                value={employeeId}
+                onChange={(e) => setEmployeeId(e.target.value)}
+                disabled={pending}
                 className="h-12 w-full rounded-xl border border-border bg-input-bg pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-brand-green-mid focus:bg-white focus:ring-2 focus:ring-brand-green/15 disabled:opacity-60"
               />
             </div>
@@ -106,7 +108,7 @@ export default function LoginRightPanel() {
                 autoComplete="current-password"
                 placeholder="Enter your password"
                 required
-                disabled={pending || animating}
+                disabled={pending}
                 className="h-12 w-full rounded-xl border border-border bg-input-bg pl-11 pr-12 text-sm text-foreground outline-none transition focus:border-brand-green-mid focus:bg-white focus:ring-2 focus:ring-brand-green/15 disabled:opacity-60"
               />
               <button
@@ -125,7 +127,9 @@ export default function LoginRightPanel() {
               <input
                 type="checkbox"
                 name="remember"
-                disabled={pending || animating}
+                checked={remember}
+                onChange={(e) => setRemember(e.target.checked)}
+                disabled={pending}
                 className="size-4 rounded border-border accent-brand-green"
               />
               Remember me
@@ -140,11 +144,20 @@ export default function LoginRightPanel() {
 
           <button
             type="submit"
-            disabled={pending || animating}
+            disabled={pending}
             className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-green font-semibold text-white shadow-sm transition hover:bg-brand-green-dark active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {pending ? "Signing in..." : "Sign In"}
-            {!pending && <ArrowIcon />}
+            {pending ? (
+              <>
+                <Spinner />
+                Signing in...
+              </>
+            ) : (
+              <>
+                Sign In
+                <ArrowIcon />
+              </>
+            )}
           </button>
 
           <div className="flex items-center gap-3">
@@ -167,6 +180,32 @@ export default function LoginRightPanel() {
         </p>
       </div>
     </section>
+  );
+}
+
+function Spinner() {
+  return (
+    <svg
+      className="size-4 animate-spin"
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+    >
+      <circle
+        cx="12"
+        cy="12"
+        r="9"
+        stroke="currentColor"
+        strokeOpacity="0.25"
+        strokeWidth="3"
+      />
+      <path
+        d="M21 12a9 9 0 0 0-9-9"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
   );
 }
 

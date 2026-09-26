@@ -52,7 +52,7 @@ export async function completeEmployeeProfile(
   data: {
     store: string;
     storeManagerName: string;
-    profilePicUrl: string;
+    profilePicUrl?: string;
   },
 ): Promise<boolean> {
   if (!ObjectId.isValid(id)) return false;
@@ -63,11 +63,44 @@ export async function completeEmployeeProfile(
       $set: {
         store: data.store,
         storeManagerName: data.storeManagerName,
-        profilePicUrl: data.profilePicUrl,
         profileComplete: true,
         name: data.storeManagerName,
+        ...(data.profilePicUrl ? { profilePicUrl: data.profilePicUrl } : {}),
       },
     },
   );
   return result.matchedCount > 0;
+}
+
+export async function createEmployee(data: {
+  employeeId: string;
+  name: string;
+  passwordHash: string;
+}): Promise<Employee | null> {
+  const db = await getDb();
+  const existing = await db.collection("employees").findOne({
+    employeeId: data.employeeId,
+  });
+  if (existing) return null;
+
+  const result = await db.collection("employees").insertOne({
+    employeeId: data.employeeId,
+    name: data.name,
+    passwordHash: data.passwordHash,
+    isActive: true,
+    profileComplete: false,
+    store: null,
+    storeManagerName: null,
+    profilePicUrl: null,
+    createdAt: new Date(),
+  });
+
+  return {
+    id: result.insertedId.toString(),
+    employeeId: data.employeeId,
+    name: data.name,
+    passwordHash: data.passwordHash,
+    isActive: true,
+    profileComplete: false,
+  };
 }
