@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { useRouter } from "next/navigation";
 import { loginAction } from "@/app/actions/auth";
 import type { LoginResult } from "@/lib/types";
@@ -18,6 +19,7 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
   const [showPassword, setShowPassword] = useState(false);
   const [employeeId, setEmployeeId] = useState(rememberedEmployeeId ?? "");
   const [remember, setRemember] = useState(Boolean(rememberedEmployeeId));
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (rememberedEmployeeId) {
@@ -33,7 +35,16 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
   }, [rememberedEmployeeId]);
 
   useEffect(() => {
-    if (!state?.ok) return;
+    if (pending) setLoading(true);
+  }, [pending]);
+
+  useEffect(() => {
+    if (!state) return;
+
+    if (!state.ok) {
+      setLoading(false);
+      return;
+    }
 
     if (state.remember) {
       localStorage.setItem(REMEMBER_KEY, state.employeeId);
@@ -43,6 +54,8 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
 
     router.push(state.needsOnboarding ? "/onboarding" : "/dashboard");
   }, [state, router]);
+
+  const busy = loading || pending;
 
   return (
     <section className="relative flex flex-col justify-center overflow-hidden px-6 py-10 sm:px-10 sm:py-14 lg:px-12">
@@ -54,7 +67,11 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
           Access your account to manage your canteen, orders, and more.
         </p>
 
-        <form action={formAction} className="mt-8 flex flex-col gap-5">
+        <form
+          action={formAction}
+          onSubmit={() => setLoading(true)}
+          className="mt-8 flex flex-col gap-5"
+        >
           {state && !state.ok && (
             <div
               role="alert"
@@ -84,7 +101,7 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
                 required
                 value={employeeId}
                 onChange={(e) => setEmployeeId(e.target.value)}
-                disabled={pending}
+                disabled={busy}
                 className="h-12 w-full rounded-xl border border-border bg-input-bg pl-11 pr-4 text-sm text-foreground outline-none transition focus:border-brand-green-mid focus:bg-white focus:ring-2 focus:ring-brand-green/15 disabled:opacity-60"
               />
             </div>
@@ -108,7 +125,7 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
                 autoComplete="current-password"
                 placeholder="Enter your password"
                 required
-                disabled={pending}
+                disabled={busy}
                 className="h-12 w-full rounded-xl border border-border bg-input-bg pl-11 pr-12 text-sm text-foreground outline-none transition focus:border-brand-green-mid focus:bg-white focus:ring-2 focus:ring-brand-green/15 disabled:opacity-60"
               />
               <button
@@ -129,7 +146,7 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
                 name="remember"
                 checked={remember}
                 onChange={(e) => setRemember(e.target.checked)}
-                disabled={pending}
+                disabled={busy}
                 className="size-4 rounded border-border accent-brand-green"
               />
               Remember me
@@ -142,23 +159,7 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
             </a>
           </div>
 
-          <button
-            type="submit"
-            disabled={pending}
-            className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-green font-semibold text-white shadow-sm transition hover:bg-brand-green-dark active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {pending ? (
-              <>
-                <Spinner />
-                Signing in...
-              </>
-            ) : (
-              <>
-                Sign In
-                <ArrowIcon />
-              </>
-            )}
-          </button>
+          <SignInButton busy={busy} />
 
           <div className="flex items-center gap-3">
             <span className="h-px flex-1 bg-border" />
@@ -168,7 +169,9 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
 
           <a
             href="/register"
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand-green bg-white font-semibold text-brand-green transition hover:bg-brand-green-soft/50"
+            className={`flex h-12 w-full items-center justify-center gap-2 rounded-xl border border-brand-green bg-white font-semibold text-brand-green transition hover:bg-brand-green-soft/50 ${
+              busy ? "pointer-events-none opacity-60" : ""
+            }`}
           >
             <UserPlusIcon />
             Create an account
@@ -183,29 +186,28 @@ export default function LoginRightPanel({ rememberedEmployeeId }: Props) {
   );
 }
 
-function Spinner() {
+function SignInButton({ busy }: { busy: boolean }) {
+  const { pending } = useFormStatus();
+  const loading = busy || pending;
+
   return (
-    <svg
-      className="size-4 animate-spin"
-      viewBox="0 0 24 24"
-      fill="none"
-      aria-hidden
+    <button
+      type="submit"
+      disabled={loading}
+      className="mt-1 flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-brand-green font-semibold text-white shadow-sm transition hover:bg-brand-green-dark active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-70"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        stroke="currentColor"
-        strokeOpacity="0.25"
-        strokeWidth="3"
-      />
-      <path
-        d="M21 12a9 9 0 0 0-9-9"
-        stroke="currentColor"
-        strokeWidth="3"
-        strokeLinecap="round"
-      />
-    </svg>
+      {loading ? (
+        <>
+          <span className="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+          Signing in...
+        </>
+      ) : (
+        <>
+          Sign In
+          <ArrowIcon />
+        </>
+      )}
+    </button>
   );
 }
 
